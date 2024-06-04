@@ -32,3 +32,21 @@ jobs:
       - name: Docker Push
         run: |
           docker push ${{secrets.DOCKER_USERNAME}}/python-cicd-demo:${{github.sha}}
+
+  cd: 
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Deploy"
+        uses: appleboy/ssh-action@master
+        env:
+          DOCKER_IMAGE: ${{secrets.DOCKER_USERNAME}}/python-cicd-demo:${{github.sha}}
+        with:
+          script: |
+            echo "Downloading new Docker img version..."
+            docker pull $DOCKER_IMAGE
+            echo "Stopping current Docker img version..."
+            sleep 1
+
+      - name: Check Service
+        run: |
+          echo "Success!"
