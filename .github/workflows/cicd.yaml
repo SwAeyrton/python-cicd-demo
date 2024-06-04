@@ -37,17 +37,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: ci
     steps:
-      - name: "Deploy"
-        uses: appleboy/ssh-action@master
-        env:
+      - name: "Docker Pull"
+        env: 
           DOCKER_IMAGE: ${{secrets.DOCKER_USERNAME}}/python-cicd-demo:${{github.sha}}
-        with:
-          script: |
-            echo "Downloading new Docker img version..."
-            docker pull $DOCKER_IMAGE
-            echo "Stopping current Docker img version..."
-            sleep 1
-
-      - name: Check Service
         run: |
-          echo "Success!"
+          echo "Downloading new Docker img version..."
+            docker pull $DOCKER_IMAGE
+
+      - name: "Release"
+        if: ${{ success() }}
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.sha }}
+          release_name: "Release ${{ github.sha }}"
+          draft: false
+          prerelease: ${{ contains('develop', github.ref_name) }}
