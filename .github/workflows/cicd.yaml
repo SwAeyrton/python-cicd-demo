@@ -3,6 +3,7 @@ name: python-cicd-demo
 on:
   push:
     branches:
+      - master
       - develop
 
 jobs:
